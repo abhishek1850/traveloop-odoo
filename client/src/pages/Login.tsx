@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { Plane, Mail, Lock } from 'lucide-react';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('demo@traveloop.com');
+  const [password, setPassword] = useState('password123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
@@ -24,7 +24,19 @@ const Login = () => {
       login(res.data.token, res.data.user);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to login');
+      // Demo Mode Fallback for Hackathon (if DB is disconnected)
+      if (email === 'demo@traveloop.com' && password === 'password123') {
+        console.warn('Backend connection failed. Falling back to Demo Mode.');
+        login('demo-token-123', { 
+          id: 'demo-user-1', 
+          name: 'Demo Traveler', 
+          email: 'demo@traveloop.com',
+          avatar: 'https://i.pravatar.cc/150?u=demo'
+        });
+        navigate('/dashboard');
+      } else {
+        setError(err.response?.data?.error || 'Failed to login. Please ensure the backend is running.');
+      }
     } finally {
       setIsLoading(false);
     }
